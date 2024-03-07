@@ -1,0 +1,41 @@
+.search-form{
+    background-color: rgb(238, 175, 175);
+    border: 1px solid salmon;
+}
+
+.detail{
+    color: orange;
+    text-decoration: no;
+}
+
+.edit{
+    color: rgb(64, 64, 255);
+    text-decoration: no;
+}
+
+.delete{
+    color: red;
+    text-decoration: no;
+}
+
+table th {
+    background:  rgb(102, 139, 219);
+    font-weight: bold;
+    font-size: 18px;
+  }
+
+  table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding: 2px;
+  }
+
+.css-serial {
+    counter-reset: serial-number;  /* Atur penomoran ke 0 */
+  }
+
+  .css-serial td:first-child:before {
+    counter-increment: serial-number;  /* Kenaikan penomoran */
+    content: counter(serial-number);  /* Tampilan counter */
+  }
+
