@@ -8,8 +8,10 @@ import anggira.employeedataapp.service.EmployeeService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -24,40 +26,48 @@ public class EmployeeController {
     private final EmployeeService employeeService;
     private final EmployeeRepository employeeRepository;
 
-    @GetMapping(path = "/")
-    public ModelAndView getEmployees(Map<String, Object> model){
+    @GetMapping({"/", "/index"})
+    public String getEmployees(@ModelAttribute("inputStatus") String inputStatus, Model model){
         List<EmployeeModel> employeeModels = employeeService.getAll();
-        model.put("employees", employeeModels);
-        model.put("title", "index");
-        model.put("nik", "");
-        model.put("nama", "");
-        return new ModelAndView("index", model);
+        model.addAttribute("employees", employeeModels);
+        model.addAttribute("title", "index");
+        model.addAttribute("nik", "");
+        model.addAttribute("nama", "");
+        if (!inputStatus.isBlank() && !inputStatus.isEmpty()){
+            model.addAttribute("success", inputStatus);
+        }
+        return "index";
     }
 
     @GetMapping(path = "/add")
-    public ModelAndView addForm(Map<String, Object> model){
+    public String addForm(Model model){
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd ");
         Date date = new Date();
-        String today = dateFormat.format(date).toString();
-        model.put("title", "add");
-        model.put("today", today);
-        return new ModelAndView("add", model);
+        String today = dateFormat.format(date);
+        model.addAttribute("title", "add");
+        model.addAttribute("today", today.trim());
+        return "add";
     }
 
     @PostMapping(
             path = "/add",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE
     )
-    public ModelAndView add(@ModelAttribute InputRequest request){
-        employeeService.inputEmployee(request);
-        return new ModelAndView("redirect:/");
+    public String add(InputRequest request, Model model, RedirectAttributes redirectAttributes){
+        Boolean inputEmployee = employeeService.inputEmployee(request);
+        if (inputEmployee == false){
+            model.addAttribute("error", "nik sudah terdaftar");
+            return "add";
+        }
+        redirectAttributes.addFlashAttribute("inputStatus", "Data berhasil ditambahkan");
+        return "redirect:/";
     }
 
     @GetMapping(path = "/edit/{nik}")
-    public ModelAndView editForm(@PathVariable String nik, Map<String, Object> model){
+    public String editForm(@PathVariable String nik, Model model){
         Employee employee = employeeRepository.findById(nik).orElse(null);
         if (Objects.isNull(employee)){
-            return new ModelAndView("redirect:/");
+            return "index";
         }
         InputRequest data = new InputRequest();
         data.setNik(employee.getNik());
@@ -75,18 +85,19 @@ public class EmployeeController {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd ");
         Date date = new Date();
         String today = dateFormat.format(date).toString();
-        model.put("employee", data);
-        model.put("title", "edit");
-        model.put("today", today);
-        return new ModelAndView("edit", model);
+        model.addAttribute("employee", data);
+        model.addAttribute("title", "edit");
+        model.addAttribute("today", today.trim());
+        return "edit";
     }
 
     @PostMapping(
             path = "/edit",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE
     )
-    public ModelAndView edit(@ModelAttribute InputRequest request){
+    public ModelAndView edit(@ModelAttribute InputRequest request, RedirectAttributes redirectAttributes){
         employeeService.updateEmployee(request);
+        redirectAttributes.addFlashAttribute("editStatus", "Data berhasil diubah");
         return new ModelAndView("redirect:/");
     }
 
@@ -94,16 +105,17 @@ public class EmployeeController {
             path = "/delete/{nik}",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE
     )
-    public ModelAndView delete(@PathVariable String nik){
+    public ModelAndView delete(@PathVariable String nik, RedirectAttributes redirectAttributes){
         employeeService.delete(nik);
+        redirectAttributes.addFlashAttribute("deleteStatus", "Data berhasil dihapus");
         return new ModelAndView("redirect:/");
     }
 
     @GetMapping(path = "/detail/{nik}")
-    public ModelAndView detailForm(@PathVariable String nik, Map<String, Object> model){
+    public String detailForm(@PathVariable String nik, Model model){
         Employee employee = employeeRepository.findById(nik).orElse(null);
         if (Objects.isNull(employee)){
-            return new ModelAndView("redirect:/");
+            return "index";
         }
         InputRequest data = new InputRequest();
         data.setNik(employee.getNik());
@@ -118,13 +130,9 @@ public class EmployeeController {
         if (Objects.nonNull(employee.getAlamat())) data.setAlamat(employee.getAlamat());
         if (Objects.nonNull(employee.getNegara())) data.setNegara(employee.getNegara());
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd ");
-        Date date = new Date();
-        String today = dateFormat.format(date).toString();
-        model.put("employee", data);
-        model.put("title", "edit");
-        model.put("today", today);
-        return new ModelAndView("detail", model);
+        model.addAttribute("employee", data);
+        model.addAttribute("title", "edit");
+        return "detail";
     }
 
     @GetMapping(

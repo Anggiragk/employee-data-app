@@ -67,8 +67,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void inputEmployee(InputRequest request){
+    public Boolean inputEmployee(InputRequest request){
         LocalDate tanggalLahir = null;
+        boolean existsById = employeeRepository.existsById(request.getNik());
+        if (existsById){
+            return false;
+        }
         if (!request.getTanggalLahir().isBlank()){
             tanggalLahir = LocalDate.parse(request.getTanggalLahir());
         }
@@ -82,6 +86,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .negara(request.getNegara())
                 .build();
         employeeRepository.save(employee);
+        return true;
     }
 
     @Override

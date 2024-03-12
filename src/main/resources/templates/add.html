@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ title }}</title>
+    <title th:text="${title}"></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -19,22 +19,26 @@
             Aplikasi data pribadi
         </h1>
 
-        <form action="/edit" method="POST">
-            <h6>Detail Data Pribadi</h6>
+    <div class="alert alert-warning alert-dismissible fade show" role="alert" th:if="${error != null}">
+            <p th:text="${error}"></p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <form action="/add" method="POST">
+            <h6>Tambah Data Baru</h6>
             <div class="mb-3">
                 <label for="nik" class="form-label">NIK</label>
-                <input type="number" class="form-control" id="nik" value="{{ employee.nik }}" disabled>
-                <input type="hidden" name="nik" value="{{ employee.nik }}">
+                <input type="number" class="form-control" id="nik" name="nik" required>
             </div>
             <div class="mb-3">
                 <label for="nama" class="form-label">Nama Lengkap</label>
-                <input type="text" class="form-control" id="nama" name="namaLengkap" value="{{ employee.namaLengkap }}" disabled required>
+                <input type="text" class="form-control" id="nama" name="namaLengkap" required>
             </div>
             <div class="mb-3">
                 <label class="form-label">Jenis Kelamin</label>
                 <br>
 
-                <input class="form-check-input" type="radio" name="jenisKelamin" value="Laki-Laki" id="laki-laki" >
+                <input class="form-check-input" type="radio" name="jenisKelamin" value="Laki-Laki" id="laki-laki">
                 <label class="form-check-label" for="laki-laki">Laki-Laki</label>
 
                 <input class="form-check-input" type="radio" name="jenisKelamin" value="Perempuan" id="perempuan">
@@ -43,17 +47,16 @@
             <div class="mb-3">
                 <label for="tanggalLahir" class="form-label">Tanggal Lahir</label>
                 <br>
-                <input type="date" id="tanggalLahir" name="tanggalLahir" max="{{ today }}" value="{{ employee.tanggalLahir }} " disabled/>
+                <input type="date" id="tanggalLahir" name="tanggalLahir" th:attr="max=${today}"/>
             </div>
             <div class="mb-3">
                 <label for="alamat" class="form-label">Alamat</label>
                 <br>
-                <textarea id="alamat" name="alamat" rows="5" cols="33" disabled>{{ employee.alamat }}</textarea>
+                <textarea id="alamat" name="alamat" rows="5" cols="33" maxlength="255"></textarea>
             </div>
             <div class="mb-3">
                 <label for="negara" class="form-label">Negara</label>
                 <select id="negara" name="negara" class="form-control">
-                    <option value="{{ employee.negara }}">{{ employee.negara }}</option>
                     <option value="Afghanistan">Afghanistan</option>
                     <option value="Åland Islands">Åland Islands</option>
                     <option value="Albania">Albania</option>
@@ -300,6 +303,8 @@
                     <option value="Zimbabwe">Zimbabwe</option>
                 </select>
             </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
             <a href="/" class="btn btn-secondary">Kembali</a>
         </form>
     </div>
@@ -308,6 +313,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>
+    <script src="script.js"></script>
 </body>
 
 </html>

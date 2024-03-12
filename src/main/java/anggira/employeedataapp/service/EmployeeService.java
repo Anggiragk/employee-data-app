@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface EmployeeService {
     List<EmployeeModel> getAll();
-    void inputEmployee(InputRequest request);
+    Boolean inputEmployee(InputRequest request);
 
     void updateEmployee(InputRequest request);
 
